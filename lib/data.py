@@ -31,6 +31,16 @@ def save_data(path_save, prediction, sample_data='data/sample-submission.csv', d
 
     return
 
+def split_data(x, y, ratio, seed=1):
+    data = np.concatenate((x[:,np.newaxis], y[:,np.newaxis]), axis=-1)
+    np.random.shuffle(data)
+    num_train = int(len(x)*ratio)
+    train_x = data[:num_train, 0].reshape(-1)
+    train_y = data[:num_train, 1].reshape(-1)
+    test_x = data[num_train:, 0].reshape(-1)
+    test_y = data[num_train:, 1].reshape(-1)
+    return train_x, train_y, test_x, test_y
+
 def standardize(x):
     """Standardize the original data set."""
     mean_x = np.mean(x, axis=0)
