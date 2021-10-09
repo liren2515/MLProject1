@@ -1,14 +1,14 @@
 import numpy as np
 
-def load_data(path_dataset, sub_sample=False):
+def load_data(path_dataset, sub_sample=False, balance=False):
     """Load data and convert it to the metrics system."""
-    data = np.genfromtxt(
-        path_dataset, delimiter=",", skip_header=1, usecols=[i for i in range(2,32)])
+    data = np.genfromtxt(path_dataset, delimiter=",", skip_header=1, usecols=[i for i in range(2,32)])
     data_PRI = data[:, 13:] # raw data
     data_DER = data[:, :13]
-    prediction = np.genfromtxt(
-        path_dataset, delimiter=",", skip_header=1, usecols=[1],
-        converters={0: lambda x: -1 if b"b" in x else 1}) # 'b': -1, 's': 1 to be decided
+    #prediction = np.genfromtxt(path_dataset, delimiter=",", skip_header=1, usecols=[1], converters={0: lambda x: -1 if b"b" in x else 1}) # 'b': -1, 's': 1 to be decided
+    prediction_str = np.genfromtxt(path_dataset, delimiter=",", skip_header=1, usecols=[1], dtype=str)
+    prediction = np.ones(len(prediction_str))
+    prediction[prediction_str=='b'] = -1
 
     # sub-sample
     if sub_sample:
@@ -16,9 +16,23 @@ def load_data(path_dataset, sub_sample=False):
         data_DER = data_DER[::50]
         prediction = prediction[::50]
 
+    #print((prediction==-1).astype(int).sum(), (prediction==1).astype(int).sum()) # 164333 85667
+    if balance:
+        num_miss = (prediction==-1).astype(int).sum() - (prediction==1).astype(int).sum()
+        indx = np.where(prediction==1)[0]
+        np.random.seed(42)
+        np.random.shuffle(indx)
+        indx = indx[:num_miss]
+        data_DER_sample = data_DER[indx]
+        data_PRI_sample = data_PRI[indx]
+        prediction_sample = prediction[indx]
+        data_DER = np.concatenate((data_DER, data_DER_sample), axis=0)
+        data_PRI = np.concatenate((data_PRI, data_PRI_sample), axis=0)
+        prediction = np.concatenate((prediction, prediction_sample), axis=0)
+
     return data_PRI, data_DER, prediction
 
-def save_data(path_save, prediction, sample_data='data/sample-submission.csv', debug=False):
+def save_data(prediction, path_save, sample_data='data/sample-submission.csv', debug=False):
     """Save data to .csv format."""
     sample_data = np.genfromtxt(
         sample_data, delimiter=",", skip_header=1, usecols=[0, 1])
@@ -33,6 +47,7 @@ def save_data(path_save, prediction, sample_data='data/sample-submission.csv', d
 
 def split_data(x, y, ratio, seed=1):
     data = np.concatenate((x[:,np.newaxis], y[:,np.newaxis]), axis=-1)
+    np.random.seed(seed)
     np.random.shuffle(data)
     num_train = int(len(x)*ratio)
     train_x = data[:num_train, 0].reshape(-1)
@@ -40,6 +55,23 @@ def split_data(x, y, ratio, seed=1):
     test_x = data[num_train:, 0].reshape(-1)
     test_y = data[num_train:, 1].reshape(-1)
     return train_x, train_y, test_x, test_y
+
+def cross_validation(num_samples, ratio=0.1, seed=42):
+    num_val_set = int(1/ratio)
+    num_val_sample = int(num_samples*ratio)
+    idx = np.arange(num_samples)
+    np.random.seed(seed)
+    np.random.shuffle(idx)
+    train_sets = []
+    val_sets = []
+    sample_set = set(idx.tolist())
+    for i in range(num_val_set):
+        val_set = idx[i*num_val_sample:(i+1)*num_val_sample].tolist()
+        train_set = list(sample_set-set(val_set))
+        val_sets.append(val_set)
+        train_sets.append(train_set)
+    print('%d train/val sets are created.'%num_val_set)
+    return train_sets, val_sets
 
 def standardize(x):
     """Standardize the original data set."""
@@ -55,3 +87,15 @@ def statistic_invalid(x):
     invalid = x == -999
     invalid = np.sum(invalid.astype(float), axis=0)
     return invalid.astype(int)
+
+def build_poly(x, degree):
+    # Here we build polynomial augmentation for N-D feature.
+    poly = x.copy()
+    for i in range(1, degree):
+        poly = np.concatenate((poly, x**i), axis=-1)
+    return poly
+
+def add_bias(x):
+    N = len(x)
+    x = np.concatenate((np.ones((N,1)), x), axis=-1)
+    return x

@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 def compute_mse(y, tx, w):
     # Here we compute the MSE.
@@ -6,15 +7,6 @@ def compute_mse(y, tx, w):
     e = y-tx.dot(w)
     L = np.sum(e**2)/(2*N)
     return L
-
-def build_poly(x, degree):
-    # Here we build polynomial augmentation for 1-D feature
-    # Need to expand it for N-D feature.
-    # To do
-    poly = np.zeros((len(x),0))
-    for i in range(degree+1):
-        poly = np.concatenate((poly, (x**i).reshape((-1, 1))), axis=-1)
-    return poly
 
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
     # Here we borrow the batch_iter from the class to generate a minibatch iterator for a dataset.
@@ -75,8 +67,12 @@ def least_squares(y, tx):
     return mse, w
 
 def ridge_regression(y, tx, lambda_):
+    N = len(y)
+    D = tx.shape[-1]
     lambda_slide = lambda_*2*N
-    w = np.linalg.inv((tx.T.dot(tx)+lambda_slide*np.eye(N))).dot(tx.T).dot(y)
+    w = np.linalg.inv((tx.T.dot(tx)+lambda_slide*np.eye(D))).dot(tx.T).dot(y)
+    #print('inv ', np.linalg.inv((tx.T.dot(tx)+lambda_slide*np.eye(D))))
+    #print('is nan ', np.isnan(y).astype(int).sum())
     mse = compute_mse(y, tx, w)
     return mse, w
 

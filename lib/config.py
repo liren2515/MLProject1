@@ -34,3 +34,10 @@ PRI feature: 16 invalid: 0
 
 valid_DER_idx = [1, 2, 3, 7, 8, 9, 10, 11]
 valid_PRI_idx = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 16]
+
+methods = ['GD', 'SGD', 'LS', 'ridge', 'logistic', 'reg_logistic']
+method_idx = 3
+
+poly = True
+poly_degree = 7
+data_balance = True
