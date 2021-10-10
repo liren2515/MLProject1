@@ -10,8 +10,8 @@ def plot_train_test(train_errors, val_errors, lambdas, save_path, degree=None):
     
     degree is just used for the title of the plot.
     """
-    plt.semilogx(lambdas, train_errors, color='b', marker='*', label="Train error")
-    plt.semilogx(lambdas, val_errors, color='r', marker='*', label="Val error")
+    plt.semilogx(lambdas, train_errors, color='b', marker='*', label="Train")
+    plt.semilogx(lambdas, val_errors, color='r', marker='*', label="Val")
     plt.xlabel("lambda")
     plt.ylabel("accuracy")
     if not type(degree) == type(None):

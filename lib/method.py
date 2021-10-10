@@ -61,7 +61,11 @@ def least_squares(y, tx):
     N = len(y)
     A = (tx.T).dot(tx)
     B = (tx.T).dot(y)
-    w = np.linalg.solve(A, B)
+    try:
+        w = np.linalg.solve(A, B)
+    except:
+        print('Using pinv!')
+        w = np.linalg.pinv(A).dot(B)
     mse = compute_mse(y, tx, w)
     #mse = np.sum((y-tx.dot(w))**2)/N/2
     return mse, w
@@ -71,8 +75,6 @@ def ridge_regression(y, tx, lambda_):
     D = tx.shape[-1]
     lambda_slide = lambda_*2*N
     w = np.linalg.inv((tx.T.dot(tx)+lambda_slide*np.eye(D))).dot(tx.T).dot(y)
-    #print('inv ', np.linalg.inv((tx.T.dot(tx)+lambda_slide*np.eye(D))))
-    #print('is nan ', np.isnan(y).astype(int).sum())
     mse = compute_mse(y, tx, w)
     return mse, w
 
