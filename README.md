@@ -12,14 +12,19 @@ The test results will be saved in ./results automatically.
 2.
 
 3. Least Square
+
 Run  'python run_least_square'.
 
 4. Ridge Regression
+
 Run  'python run_ridge_regression'.
+
 (you can find the plot of accuracy-lambda in ./results/ ridge_regression.)
 
 5. Regularized Logistic Regression
+
 Run  'python run_reg_logistic_regression'.
+
 (If you don't want to wait since it will take some time to build the augmented features, disable augmentation.)
 
 6. 
