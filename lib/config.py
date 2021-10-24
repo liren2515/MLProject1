@@ -38,6 +38,10 @@ valid_PRI_idx = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 16]
 methods = ['GD', 'SGD', 'LS', 'ridge', 'logistic', 'reg_logistic']
 method_idx = 3
 
-poly = False
-poly_degree = 15
+augmentation = True
+power_degree = 15
 data_balance = False
+
+num_interval_lambda = 10
+max_iters = 500
+gamma = 0.1 

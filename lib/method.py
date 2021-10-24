@@ -1,12 +1,27 @@
 import numpy as np
 import time
 
+def sigmoid(t):
+    sig_t = 1./(1+np.exp(-t))
+    return sig_t
+
+# A more stable version of Sigmoid, to avoid overflow!
+def sigmoid(x):
+    return .5 * (1 + np.tanh(.5 * x))
+
 def compute_mse(y, tx, w):
     # Here we compute the MSE.
     N = len(y)
     e = y-tx.dot(w)
     L = np.sum(e**2)/(2*N)
     return L
+
+def compute_cross_entropy(y, tx, w, lambda_=0, with_regularizer=False):
+    sig_xw = sigmoid(tx.dot(w))
+    CE = np.sum(np.log(1+np.exp(tx.dot(w))) - y*tx.dot(w))/len(y)
+    if with_regularizer:
+       CE += lambda_/2*np.sum(w**2)
+    return CE
 
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
     # Here we borrow the batch_iter from the class to generate a minibatch iterator for a dataset.
@@ -67,7 +82,6 @@ def least_squares(y, tx):
         print('Using pinv!')
         w = np.linalg.pinv(A).dot(B)
     mse = compute_mse(y, tx, w)
-    #mse = np.sum((y-tx.dot(w))**2)/N/2
     return mse, w
 
 def ridge_regression(y, tx, lambda_):
@@ -78,11 +92,27 @@ def ridge_regression(y, tx, lambda_):
     mse = compute_mse(y, tx, w)
     return mse, w
 
+def compute_gradient_logistic(y, tx, w, lambda_=0, with_regularizer=False):
+    grad = tx.T.dot(sigmoid(tx.dot(w))-y)/len(y)
+    if with_regularizer:
+        grad += lambda_*w
+    return grad
+
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
     pass
     return
 
 
-def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
-    pass
-    return
+def reg_logistic_regression(y_raw, tx, lambda_, initial_w, max_iters, gamma):
+    y = y_raw.copy()    
+    y[y<0] = 0 # change label -1 to 0
+    w = initial_w
+    loss = compute_cross_entropy(y, tx, w, lambda_=lambda_, with_regularizer=True)
+
+    for n_iter in range(max_iters):
+        g = compute_gradient_logistic(y, tx, w, lambda_=lambda_, with_regularizer=True)
+        w = w-gamma*g
+        loss = compute_cross_entropy(y, tx, w, lambda_=lambda_, with_regularizer=True)
+        print("Gradient Descent({bi}/{ti}): loss={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
+
+    return loss, w

@@ -88,12 +88,60 @@ def statistic_invalid(x):
     invalid = np.sum(invalid.astype(float), axis=0)
     return invalid.astype(int)
 
-def build_poly(x, degree):
-    # Here we build polynomial augmentation for N-D feature.
+def build_power(x, degree):
+    # Here we build power-series augmentation for N-D feature.
     poly = x.copy()
-    for i in range(1, degree):
+    for i in range(2, degree+1):
         poly = np.concatenate((poly, x**i), axis=-1)
     return poly
+
+def build_poly_power(x, degree):
+    # Here we build power-series augmentation starting from degree 4 for N-D feature.
+    poly = x**4
+    for i in range(5, degree+1):
+        poly = np.concatenate((poly, x**i), axis=-1)
+    return poly
+
+def build_poly_with_interation(x):
+    # Here we build polynomial augmentation of degree 2 for N-D feature.
+    D = x.shape[-1]
+    poly = x.copy()
+    poly = np.concatenate((poly, x**2), axis=-1)
+    for i in range(D):
+        for j in range(i+1, D):
+            x_ij = x[:,[i]]*x[:,[j]]
+            #print(x_ij.shape, poly.shape)
+            poly = np.concatenate((poly, x_ij), axis=-1)
+    return poly
+
+def build_poly_with_interation_3(x):
+    # Here we build polynomial augmentation of degree 3 for N-D feature.
+    D = x.shape[-1]
+    poly = x.copy()
+    poly = np.concatenate((poly, x**2, x**3), axis=-1)
+    for i in range(D):
+        for j in range(i+1, D):
+            x_ij = x[:,[i]]*x[:,[j]]
+            #print(x_ij.shape, poly.shape)
+            poly = np.concatenate((poly, x_ij), axis=-1)
+            poly = np.concatenate((poly, x_ij*x[:,[i]]), axis=-1)
+            for k in range(j, D):
+                poly = np.concatenate((poly, x_ij*x[:,[k]]), axis=-1)
+            
+    return poly
+
+def build_sin_2(x):
+    # Here we build sine augmentation of degree 2 for N-D feature.
+    D = x.shape[-1]
+    sin = np.concatenate((np.sin(x), np.cos(x), np.sin(2*x), np.cos(2*x)), axis=-1)
+    for i in range(D):
+        sin_i = np.sin(x[:,[i]])
+        cos_i = np.cos(x[:,[i]])
+        for j in range(i+1, D):
+            sin_j = np.sin(x[:,[j]])
+            cos_j = np.cos(x[:,[j]])
+            sin = np.concatenate((sin, sin_i*sin_j, sin_i*cos_j, cos_i*sin_j, cos_i*cos_j), axis=-1)
+    return sin
 
 def add_bias(x):
     N = len(x)
