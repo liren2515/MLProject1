@@ -70,12 +70,6 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
 
     return loss, w
 
-def compute_stoch_gradient(y, tx, w):
-    """Compute a stochastic gradient from just few examples n and their corresponding y_n labels."""
-    err = y - tx.dot(w)
-    grad = -tx.T.dot(err) / len(err)
-    return grad, err
-
 def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
     w = initial_w
     loss = compute_mse(y, tx, w)
