@@ -12,7 +12,7 @@ def sigmoid(x):
 def compute_mse(y, tx, w):
     # Here we compute the MSE.
     N = len(y)
-    e = y-tx.dot(w)
+    e = abs(y-tx.dot(w))
     L = np.sum(e**2)/(2*N)
     return L
 
@@ -47,6 +47,17 @@ def compute_gradient(y, tx, w):
     grad = -(tx.T).dot(e)/N
     return grad
 
+def compute_stoch_gradient(y, tx, w):
+    # Compute a stochastic gradient from just few examples n and their corresponding y_n labels.
+    err = y - tx.dot(w)
+    grad = -tx.T.dot(err) / len(err)
+    return grad
+
+def compute_loss(y, tx, w):
+    # Calculate the loss using mse
+    e = y - tx.dot(w)
+    return 1/2*np.mean(e**2)
+
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     # Optimization using Gradient Descent.
     w = initial_w
@@ -55,7 +66,7 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
         g = compute_gradient(y, tx, w)
         w = w-gamma*g
         loss = compute_mse(y, tx, w)
-        print("Gradient Descent({bi}/{ti}): loss={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
+        # print("Gradient Descent({bi}/{ti}): loss={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
 
     return loss, w
 
@@ -68,7 +79,7 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
             g = compute_stoch_gradient(minibatch_y, minibatch_tx, w)
             w = w-gamma*g
             loss = compute_loss(y, tx, w)
-        print("SGD({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(bi=i, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
+        # print("SGD({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(bi=i, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
                 
     return loss, w
 
