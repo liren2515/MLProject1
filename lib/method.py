@@ -76,14 +76,6 @@ def compute_stoch_gradient(y, tx, w):
     grad = -tx.T.dot(err) / len(err)
     return grad, err
 
-def compute_loss(y, tx, w):
-    """Calculate the loss.
-
-    You can calculate the loss using mse
-    """
-    e = y - tx.dot(w)
-    return 1/2*np.mean(e**2)
-
 def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
     w = initial_w
     loss = compute_mse(y, tx, w)
@@ -124,8 +116,16 @@ def compute_gradient_logistic(y, tx, w, lambda_=0, with_regularizer=False):
     return grad
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
-    pass
-    return
+    y[y < 0] = 0
+    w = initial_w
+    
+    for n_iter in range(max_iters):
+        g = compute_gradient_logistic(y, tx, w)
+        w = w - gamma * g
+        loss = compute_cross_entropy(y, tx, w)
+        print("Gradient Descent({bi}/{ti}): loss={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
+
+    return loss, w
 
 
 def reg_logistic_regression(y_raw, tx, lambda_, initial_w, max_iters, gamma):
