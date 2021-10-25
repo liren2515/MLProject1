@@ -9,9 +9,11 @@ In lib/config.py, you can find the following hyper-parameters which you may want
 The test results will be saved in ./results automatically.
 
 
-1.
+1.Least Square Gradient Descent: 
+run  'python run_least_square_GD.py'.
 
-2.
+2.Least Square Stochastic Gradient Descent: 
+run  'python run_least_square_SGD.py'.
 
 3. Least Square: 
 run  'python run_least_square'.
