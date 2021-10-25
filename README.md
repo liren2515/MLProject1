@@ -6,6 +6,8 @@ In lib/config.py, you can find the following hyper-parameters which you may want
 - max_iters: the maximum number of iterations taken for GD/SGD;
 - gamma: the step size for GD/SGD;
 
+We exclude invalid variables whoes value can be -999.0, and consider polynomial/power-series/sine feature augmentation. The augmented features are normalized to have zero-means and unit-variances. We apply 10-fold cross validation. More details can be found in our report.
+
 The test results will be saved in ./results automatically.
 
 0. Best Result (which will give you 0.813/0.717 for the accurayc/F1 score):
