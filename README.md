@@ -1,3 +1,5 @@
+First, you need to unzip the train/test.zip files in ./data (put the unziped files at ./data).
+
 In lib/config.py, you can find the following hyper-parameters which you may want to change:
 - augmentation: use feature augmentation;
 - power_degree: the degree of power-series feature augmentation;
