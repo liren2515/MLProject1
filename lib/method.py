@@ -20,7 +20,7 @@ def compute_cross_entropy(y, tx, w, lambda_=0, with_regularizer=False):
     sig_xw = sigmoid(tx.dot(w))
     CE = np.sum(np.log(1+np.exp(tx.dot(w))) - y*tx.dot(w))/len(y)
     if with_regularizer:
-       CE += lambda_/2*np.sum(w**2)
+       CE += lambda_*np.sum(w**2)
     return CE
 
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
@@ -106,7 +106,7 @@ def ridge_regression(y, tx, lambda_):
 def compute_gradient_logistic(y, tx, w, lambda_=0, with_regularizer=False):
     grad = tx.T.dot(sigmoid(tx.dot(w))-y)/len(y)
     if with_regularizer:
-        grad += lambda_*w
+        grad += 2*lambda_*w
     return grad
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):

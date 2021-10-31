@@ -57,9 +57,9 @@ print('Run Least Square Stochastic Gradient Descent!')
 function = method.least_squares_SGD
 y = prediction
 tx = data_DER
-initial_w = np.ones(tx.shape[-1])
+initial_w = np.zeros(tx.shape[-1])
 max_iters = config.max_iters
-gamma = config.gamma
+gamma = 0.001#config.gamma
 
 # Create sub-dataset for cross validation
 num_samples = len(y)
